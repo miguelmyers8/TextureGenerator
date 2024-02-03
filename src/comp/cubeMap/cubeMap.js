@@ -79,6 +79,7 @@ export class CubeMap{
 
     toNormal(params){
         this.mapType = true
+        this.cube.material.side = THREE.DoubleSide
           let p = this.cube
           let calculateNormal =()=>{
             let sumCenter = NODE.vec3(0)
@@ -95,20 +96,45 @@ export class CubeMap{
            normalMap     = normalMap.mul(params.strength) 
            return normalMap.mul(0.5).add(0.5)  
           }
-          p.material.colorNode = calculateNormal()
+          return calculateNormal()
     }
 
-    light(ld, colorIntesity){
+    light(ld, lightIntesity){
         let p = this.cube
         p.material.colorNode = Shaders.defualtLight({
             normalMap:p.material.colorNode.rgba,
             lightPosition:ld,
             cP:NODE.vec3(0.,0.,0.)
-            }).mul(colorIntesity)
+            }).mul(lightIntesity)
       }
+
+    color(params){
+        const shaderColor = NODE.glslFn(`
+vec3 planetColor(float noiseSample,float moisture){
+  vec3 rockColor1 = vec3(.9,.3,.1)/1.1;
+  vec3 rockColor2 = vec3(.8,.2,.1);
+  vec3 landColor  = mix(rockColor1,rockColor2,smoothstep(0.0001,0.5,noiseSample));
+  vec3 finalColor = mix(vec3(1.)/1.5,landColor,smoothstep(0.004,0.25,moisture));
+
+  return finalColor;
+ }
+`)
+let p = this.cube
+let n = this.toDisplace()
+
+
+
+
+params.v_ = ((NODE.positionLocal).mul(params.inScale))//.mul(NODE.vec3(1,2,1))
+let nn = Shaders.snoise3Dfbm(params).mul(params.outScale)
+
+p.material.colorNode = shaderColor({noiseSample:n, moisture:nn}).mul(p.material.colorNode)
+    }
+
 
     toDisplace(){
         this.mapType = false
+        this.cube.material.side = THREE.DoubleSide
         let p = this.cube
         let calculateDisplace = ()=>{
           let sumCenter = NODE.vec3(0)
@@ -117,7 +143,7 @@ export class CubeMap{
           });
          return sumCenter 
         }
-        p.material.colorNode = calculateDisplace()
+        return calculateDisplace()
     }
 
     buildCube(){
@@ -231,11 +257,6 @@ export class CubeMap{
     }
 
     snapShot(download=false,normal={}){
-        if (!(Object.keys(normal).length === 0)){
-            this.toNormal(normal)
-        }else{
-            this.toDisplace()
-        }
         this.snapShotRight (download)
         this.snapShotLeft  (download)
         this.snapShotTop   (download)

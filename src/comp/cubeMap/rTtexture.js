@@ -11,7 +11,7 @@ export class RtTexture {
 
  initRenderTraget(){
     this. rtScene       = new THREE.Scene();
-    this. rtScene.background  = new THREE.Color('white');
+    this. rtScene.background  = new THREE.Color('pink');
     this. rtCamera      = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     this. renderTarget  = new THREE.WebGLRenderTarget(this.rtWidth, this.rtHeight);
   }

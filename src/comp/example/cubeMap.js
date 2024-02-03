@@ -13,7 +13,7 @@ export function cubeMap (renderer_){
         outScale:         0.3,
         seed_:            1.0,
         normalScale:      .08,
-        redistribution_:   3.,
+        redistribution_:   6.,
         persistance_:     .35,
         lacunarity_:       2.,
         iteration_:        15,
@@ -23,23 +23,37 @@ export function cubeMap (renderer_){
     cubeMap.simplexFbm({
         inScale:          7.0,
         scale_:           2.0,
-        outScale:         1.0,
+        outScale:         0.8,
         seed_:            1.0,
         normalScale:      .08,
-        redistribution_:   2.,
+        redistribution_:   4.,
         persistance_:     .35,
         lacunarity_:       2.2,
-        iteration_:        10,
-        terbulance_:     false,
-        ridge_:          false,
+        iteration_:        15,
+        terbulance_:    false,
+        ridge_:         false,
     })
-    cubeMap.snapShot(cubeMapDownload,{
-        scale:    3.5,  
-        epsilon: 0.0015,  
+    cubeMap.cube.material.colorNode = cubeMap.toNormal({
+        scale:    1.5,  
+        epsilon: 0.001,  
         strength:   1.,    
     })
-    cubeMap.light(NODE.vec3(1.8,-1.8,1.8),3)
-    cubeMap.dispose()
+    cubeMap.light(NODE.vec3(1.8,-1.8,1.8),8)
+    cubeMap.color({
+        inScale:          1.0,
+        scale_:           0.5,
+        outScale:         0.8,
+        seed_:            1.0,
+        normalScale:      .08,
+        redistribution_:   1.0,
+        persistance_:     .5,
+        lacunarity_:       3.5,
+        iteration_:        15,
+        terbulance_:    true,
+        ridge_:         false,
+    })
+    cubeMap.snapShot(cubeMapDownload)
+    //cubeMap.dispose()
     return cubeMap//.textuerArray.map((canvas)=>{return new THREE.CanvasTexture(canvas)})
 }
 
